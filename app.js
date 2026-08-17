@@ -1,5 +1,4 @@
-// app.js — main page: unit/chapter/section browser, character search, and the
-// random Pop Quiz configuration panel.
+
 
 async function loadData() {
   const res = await fetch('data.json');
@@ -34,7 +33,7 @@ function renderUnit(unit) {
   return wrap;
 }
 
-// ---------- search ----------
+// search bar
 function renderSearchResults(container, matches, query) {
   container.innerHTML = '';
   if (!query) return;
@@ -57,7 +56,7 @@ function renderSearchResults(container, matches, query) {
     container.appendChild(row);
   });
 
-  // A Chinese character that isn't in the data yet can still be practiced directly.
+
   const isChineseText = /[\u4e00-\u9fff]/.test(query);
   const exactCharMatch = matches.some(m => m.char === query);
   if (isChineseText && !exactCharMatch) {
@@ -92,7 +91,7 @@ function setupSearch(data) {
   });
 }
 
-// ---------- random pop quiz config ----------
+// random quiz
 function setupRandomQuiz(data) {
   const unitSelect = document.getElementById('quiz-unit-select');
   const chapterSelect = document.getElementById('quiz-chapter-select');
@@ -150,8 +149,9 @@ async function init() {
     setupRandomQuiz(data);
   } catch (err) {
     container.appendChild(el('p', { text: 'Error loading data: ' + err.message }));
-    container.appendChild(el('p', { text: 'If you opened this file directly (file://), run a local server instead, e.g. "python3 -m http.server" then open http://localhost:8000' }));
+    container.appendChild(el('p', { text: 'return back to main page' }));
   }
 }
 
 init();
+//yc
