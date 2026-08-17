@@ -1,25 +1,27 @@
-// learn.js — per-section learning view: Character Learning (preview + quiz) and Pop Quiz.
+// main learn page
 
 function getParams() {
   const p = new URLSearchParams(window.location.search);
-  return { unit: p.get('unit'), chapter: p.get('chapter'), section: p.get('section') };
+  return { book: p.get('book'), unit: p.get('unit'), chapter: p.get('chapter'), section: p.get('section') };
 }
 
 async function loadSection() {
-  const res = await fetch('data.json');
-  const data = await res.json();
-  const { unit: unitId, chapter: chapterId, section: sectionId } = getParams();
+  const { book: bookId, unit: unitId, chapter: chapterId, section: sectionId } = getParams();
+  const book = BOOKS.find(b => b.id === bookId);
+  if (!book) throw new Error('Unknown textbook: ' + bookId);
+  const data = await loadBook(book.file);
   const unit = data.units.find(u => u.id === unitId);
   if (!unit) throw new Error('Unit not found: ' + unitId);
   const chapter = unit.chapters.find(c => c.id === chapterId);
   if (!chapter) throw new Error('Chapter not found: ' + chapterId);
   const section = chapter.sections.find(s => s.id === sectionId);
   if (!section) throw new Error('Section not found: ' + sectionId);
-  return { unit, chapter, section };
+  return { book, unit, chapter, section };
 }
 
 const root = document.getElementById('app-root');
 const breadcrumbEl = document.getElementById('breadcrumb-info');
+const backLinkEl = document.getElementById('back-link');
 const modeSelectEl = document.getElementById('mode-select');
 const progressInner = document.getElementById('progress-bar-inner');
 const progressLabel = document.getElementById('progress-label');
@@ -41,7 +43,7 @@ const ctx = { root, clearRoot, setProgress };
 
 function startCharacterLearning(section) {
   const items = section.characters;
-  const total = items.length * 2; // N preview steps + N quiz steps
+  const total = items.length * 2; 
   runLearnPhase(ctx, items, 0, total, () => {
     runQuizPhase(ctx, items, 0, { correct: 0, total: items.length }, items.length, total, LEARNING_QUIZ_OPTIONS, (tally) => {
       setProgress(total, total, 'Complete');
@@ -57,8 +59,8 @@ function startPopQuiz(section) {
   const items = section.characters;
   const total = items.length;
   runQuizPhase(ctx, items, 0, { correct: 0, total: items.length }, 0, total, POP_QUIZ_WRITER_OPTIONS, (tally) => {
-    setProgress(total, total, 'Complete');
-    showQuizResults(ctx, tally, 'Pop quiz complete', [
+    setProgress(total, total, 'Complete!!');
+    showQuizResults(ctx, tally, 'Pop quiz complete!!', [
       { label: 'Retry', onClick: () => startPopQuiz(section) },
       { label: 'Back to mode select', onClick: showModeSelect }
     ]);
@@ -73,9 +75,13 @@ function showModeSelect() {
 
 async function init() {
   try {
-    const { unit, chapter, section } = await loadSection();
+    const { book, unit, chapter, section } = await loadSection();
     const sentenceSuffix = section.sentence ? ` — ${section.sentence}` : '';
-    breadcrumbEl.textContent = `${unit.title} / ${chapter.title} / ${section.title}${sentenceSuffix}`;
+    breadcrumbEl.textContent = `${book.label} / ${unit.title} / ${chapter.title} / ${section.title}${sentenceSuffix}`;
+    if (backLinkEl) {
+      backLinkEl.href = 'textbook' + book.id + '.html';
+      backLinkEl.textContent = '← Back to ' + book.label;
+    }
 
     document.getElementById('mode-character').addEventListener('click', () => {
       modeSelectEl.classList.add('hidden');
@@ -89,8 +95,9 @@ async function init() {
     showModeSelect();
   } catch (err) {
     breadcrumbEl.textContent = 'Error: ' + err.message;
-    root.appendChild(el('p', { text: 'Make sure you reached this page via a unit/chapter/section link, and that you are running a local server (not file://).' }));
+    root.appendChild(el('p', { text: '' }));
   }
 }
 
 init();
+//YC

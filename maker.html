@@ -89,17 +89,6 @@ let data={
     units:[]
 };
 
-function removeSentenceAndTranslationFields(obj){
-    if(!obj || typeof obj !== "object") return;
-    if(Array.isArray(obj)){
-        obj.forEach(removeSentenceAndTranslationFields);
-        return;
-    }
-    delete obj.sentence;
-    delete obj.translation;
-    Object.values(obj).forEach(removeSentenceAndTranslationFields);
-}
-
 const importInput=document.getElementById("importFile");
 
 importInput.addEventListener("change",(e)=>{
@@ -113,7 +102,6 @@ const reader=new FileReader();
 reader.onload=()=>{
 
 data=JSON.parse(reader.result);
-removeSentenceAndTranslationFields(data);
 
 render();
 
@@ -322,8 +310,6 @@ editor.appendChild(unitDiv);
 }
 
 function exportJSON(){
-
-removeSentenceAndTranslationFields(data);
 
 const blob=new Blob(
 [

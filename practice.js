@@ -1,6 +1,3 @@
-// practice.js — single-item practice view reached from the main page's search bar.
-// Same preview -> quiz flow as Character Learning, just for one searched item
-// (which may or may not exist in data.json).
 
 function getParams() {
   const p = new URLSearchParams(window.location.search);
@@ -24,7 +21,7 @@ const ctx = { root, clearRoot, setProgress };
 
 function startPractice(item) {
   const items = [item];
-  const total = 2; // 1 preview step + 1 quiz step
+  const total = 2; 
   runLearnPhase(ctx, items, 0, total, () => {
     runQuizPhase(ctx, items, 0, { correct: 0, total: 1 }, 1, total, LEARNING_QUIZ_OPTIONS, (tally) => {
       setProgress(total, total, 'Complete');
@@ -48,3 +45,4 @@ function init() {
 }
 
 init();
+//YC

@@ -1,9 +1,4 @@
-// quiz-engine.js — shared learn-phase / quiz-phase rendering, reused by learn.js
-// (per-section Character Learning + Pop Quiz), practice.js (search bar practice),
-// and random-quiz.js (random Pop Quiz).
 
-// radicalColor is only ever used here, i.e. in preview/learning contexts — never in
-// a quiz, and never in Pop Quiz, since that would give the answer away.
 const PREVIEW_WRITER_OPTIONS = {
   radicalColor: '#168F16',
   showOutline: true,
@@ -16,8 +11,7 @@ const LEARNING_QUIZ_OPTIONS = {
   highlightOnComplete: true
 };
 
-// Every Pop Quiz — per-section and random — uses exactly this: character and outline
-// hidden up front, one mistake before a hint, no reveal flash on completion.
+
 const POP_QUIZ_WRITER_OPTIONS = {
   showCharacter: false,
   showOutline: false,
@@ -25,7 +19,6 @@ const POP_QUIZ_WRITER_OPTIONS = {
   highlightOnComplete: false
 };
 
-// ctx = { root: HTMLElement, clearRoot: fn, setProgress: fn(current, total, label) }
 
 function runLearnPhase(ctx, items, index, total, onDone) {
   ctx.clearRoot();
@@ -56,8 +49,7 @@ function runLearnPhase(ctx, items, index, total, onDone) {
   ctx.root.appendChild(controls);
 }
 
-// progressBase/progressTotal let this be used standalone or chained after another phase.
-// quizOptions is one of LEARNING_QUIZ_OPTIONS or POP_QUIZ_WRITER_OPTIONS (or a custom set).
+
 function runQuizPhase(ctx, items, index, tally, progressBase, progressTotal, quizOptions, onDone) {
   ctx.clearRoot();
   if (index >= items.length) return onDone(tally);
@@ -68,15 +60,15 @@ function runQuizPhase(ctx, items, index, tally, progressBase, progressTotal, qui
   const subChars = subCharsOf(item);
   const size = writerSize(subChars.length);
 
-  ctx.root.appendChild(el('h2', { text: 'Quiz: write this' }));
-  ctx.root.appendChild(el('p', { text: `${item.pinyin || ''}  —  ${item.meaning || ''}` }));
+
+  ctx.root.appendChild(el('h2', { text: `${item.pinyin || ''}  —  ${item.meaning || ''}` }));
 
   const row = el('div', { class: 'word-writer-row' });
   ctx.root.appendChild(row);
 
   const feedback = el('p', { id: 'quiz-feedback' });
   const controls = el('div', { class: 'controls' });
-  const skipBtn = el('button', { text: 'Show answer / skip' });
+  const skipBtn = el('button', { text: 'skip!' });
   controls.appendChild(skipBtn);
 
   let finishedCount = 0;
@@ -132,3 +124,4 @@ function showQuizResults(ctx, tally, title, actions) {
   });
   ctx.root.appendChild(controls);
 }
+//YC

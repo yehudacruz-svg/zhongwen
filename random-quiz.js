@@ -1,10 +1,9 @@
-// random-quiz.js — the random Pop Quiz: pulls `count` characters/words at random from
-// the chosen scope (all data / one unit / one chapter) and runs them through the exact
-// same no-hints-up-front Pop Quiz flow as the per-section Pop Quiz (POP_QUIZ_WRITER_OPTIONS).
+// random quiz geneator
 
 function getParams() {
   const p = new URLSearchParams(window.location.search);
   return {
+    book: p.get('book') || 'all',
     unit: p.get('unit') || 'all',
     chapter: p.get('chapter') || 'all',
     count: Math.min(100, Math.max(10, parseInt(p.get('count'), 10) || 20))
@@ -31,35 +30,50 @@ function startRandomQuiz(pool, count) {
   const total = items.length;
   runQuizPhase(ctx, items, 0, { correct: 0, total: items.length }, 0, total, POP_QUIZ_WRITER_OPTIONS, (tally) => {
     setProgress(total, total, 'Complete');
-    showQuizResults(ctx, tally, 'Pop quiz complete', [
+    showQuizResults(ctx, tally, 'Pop quiz complete!', [
       { label: 'New random set', onClick: () => startRandomQuiz(pool, count) },
-      { label: 'Back to main page', onClick: () => { window.location.href = 'index.html'; } }
+      { label: 'Back to Pop Quiz', onClick: () => { window.location.href = 'pop-quiz.html'; } }
     ]);
   });
 }
 
 async function init() {
   try {
-    const res = await fetch('data.json');
-    const data = await res.json();
-    const { unit, chapter, count } = getParams();
-    const scope = { unitId: unit === 'all' ? null : unit, chapterId: chapter === 'all' ? null : chapter };
-    const pool = flattenCharacters(data, scope);
+    const { book, unit, chapter, count } = getParams();
+    let pool = [];
+    let scopeLabel = 'All textbooks';
 
-    const unitObj = data.units.find(u => u.id === unit);
-    const chapterObj = unitObj ? unitObj.chapters.find(c => c.id === chapter) : null;
-    const scopeLabel = chapterObj ? chapterObj.title : (unitObj ? unitObj.title : 'All units');
+    if (book === 'all') {
+      for (const b of BOOKS) {
+        const data = await loadBook(b.file);
+        pool = pool.concat(flattenCharacters(data));
+      }
+    } else {
+      const bookObj = BOOKS.find(b => b.id === book);
+      if (!bookObj) throw new Error('Unknown textbook: ' + book);
+      const data = await loadBook(bookObj.file);
+      const scope = { unitId: unit === 'all' ? null : unit, chapterId: chapter === 'all' ? null : chapter };
+      pool = flattenCharacters(data, scope);
+
+      const unitObj = data.units.find(u => u.id === unit);
+      const chapterObj = unitObj ? unitObj.chapters.find(c => c.id === chapter) : null;
+      scopeLabel = chapterObj
+        ? `${bookObj.label} — ${chapterObj.title}`
+        : (unitObj ? `${bookObj.label} — ${unitObj.title}` : bookObj.label);
+    }
+
     breadcrumbEl.textContent = `Pop Quiz — ${scopeLabel} — ${count} random characters`;
 
     if (pool.length === 0) {
-      root.appendChild(el('p', { text: 'No characters found in this scope yet — go back and pick a different scope.' }));
+      root.appendChild(el('p', { text: 'No characters found! :(' }));
       return;
     }
 
     startRandomQuiz(pool, count);
   } catch (err) {
-    breadcrumbEl.textContent = 'Error: ' + err.message;
+    breadcrumbEl.textContent = 'Error: this sucks and' + err.message;
   }
 }
 
 init();
+//YC
