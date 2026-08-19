@@ -165,7 +165,7 @@ function buildHeader(activePage) {
 function buildFooter() {
   const footer = el('footer', { class: 'site-footer' });
   const inner = el('div', { class: 'site-footer-inner' });
-  inner.appendChild(el('p', { class: 'footer-copy', text: '© ' + new Date().getFullYear() + ' 做康建宁' }));
+  inner.appendChild(el('p', { class: 'footer-copy', text: '© ' + new Date().getFullYear() + ' 康建宁 制作' }));
   const links = el('nav', { class: 'footer-links' }, [
     el('a', { href: 'index.html', text: 'Home' }),
     el('a', { href: 'login.html', text: "Admin Page" }),
