@@ -168,7 +168,7 @@ function buildFooter() {
   inner.appendChild(el('p', { class: 'footer-copy', text: '© ' + new Date().getFullYear() + ' 康建宁 制作' }));
   const links = el('nav', { class: 'footer-links' }, [
     el('a', { href: 'index.html', text: 'Home' }),
-    el('a', { href: 'login.html', text: "Admin Page" }),
+    el('a', { href: 'login.html', text: "" }),
     el('a', { href: 'suggestion.html', text: 'Bugs and Suggestions' }),
     el('a', { href: 'terms.html', text: 'Terms and Privacy' })
 
